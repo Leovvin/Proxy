@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
+    <bean id="server" class="org.willingfish.sock5.serv.Server">
+        <property name="port" value="${port}"></property>
+    </bean>
+    <bean id="config" class="org.willingfish.sock5.env.Config">
+        <property name="pass" value="${pass}"></property>
+        <property name="port" value="${port}"></property>
+    </bean>
+
+
+</beans>
