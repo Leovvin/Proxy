@@ -8,11 +8,6 @@ import org.willingfish.sock5.serv.Server;
 public class Main {
     public static void main(String[] args){
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
-        Server server = context.getBean(Server.class);
-        try {
-            server.start();
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
+        context.start();
     }
 }
