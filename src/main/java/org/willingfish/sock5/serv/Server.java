@@ -9,9 +9,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
-import io.netty.handler.codec.socksx.v5.Socks5PasswordAuthRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
-import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
@@ -19,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.willingfish.sock5.hanlder.ProxyIdleHandler;
 import org.willingfish.sock5.hanlder.Socks5CommandRequestHandler;
 import org.willingfish.sock5.hanlder.Socks5InitialRequestHandler;
-import org.willingfish.sock5.hanlder.Socks5PasswordAuthRequestHandler;
 
 
 @Slf4j
@@ -41,12 +38,10 @@ public class Server {
                         ch.pipeline()
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
-                                .addLast(new LoggingHandler(LogLevel.INFO))
+                                .addLast(new LoggingHandler())
                                 .addLast(Socks5ServerEncoder.DEFAULT)
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())
-                                .addLast(new Socks5PasswordAuthRequestDecoder())
-                                .addLast(new Socks5PasswordAuthRequestHandler())
                                 .addLast(new Socks5CommandRequestDecoder())
                                 .addLast(new Socks5CommandRequestHandler(group))
                                 ;
