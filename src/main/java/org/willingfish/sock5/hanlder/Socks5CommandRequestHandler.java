@@ -1,11 +1,14 @@
 package org.willingfish.sock5.hanlder;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.v5.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.ByteBuffer;
 
 @Slf4j
 public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5CommandRequest> {
@@ -71,14 +74,29 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelRead(ChannelHandlerContext ctx2, Object destMsg) throws Exception {
-            log.trace("将目标服务器信息转发给客户端");
+            log.info("send data from target server to client");
+            if (destMsg==null){
+                return;
+            }
+            if (destMsg instanceof ByteBuf){
+                ByteBuf byteBuf = (ByteBuf) destMsg;
+                if (byteBuf.readableBytes()<=0){
+                    return;
+                }
+            }
             clientChannelContext.writeAndFlush(destMsg);
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx2) throws Exception {
-            log.trace("目标服务器断开连接");
+            log.info("break target server connect");
             clientChannelContext.channel().close();
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            log.error("dest to client channel meet exception",cause);
+            ctx.channel().close();
         }
     }
 
@@ -98,14 +116,30 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            log.trace("将客户端的消息转发给目标服务器端");
+            log.info("send data from client to target server");
+            if (msg==null){
+                return;
+            }
+            if (msg instanceof ByteBuf){
+                ByteBuf byteBuf = (ByteBuf) msg;
+                if (byteBuf.readableBytes()<=0){
+                    return;
+                }
+            }
             destChannelFuture.channel().writeAndFlush(msg);
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-            log.trace("客户端断开连接");
+            log.info("break client connect");
             destChannelFuture.channel().close();
+        }
+
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            log.error("client to dest channel failed",cause);
+            ctx.channel().close();
         }
     }
 }
