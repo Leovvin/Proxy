@@ -12,15 +12,25 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.willingfish.sock5.hanlder.ProxyIdleHandler;
-import org.willingfish.sock5.hanlder.Socks5CommandRequestHandler;
-import org.willingfish.sock5.hanlder.Socks5InitialRequestHandler;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.willingfish.sock5.common.IServer;
+import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
+import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
+import org.willingfish.sock5.common.handler.ProxyIdleHandler;
+import org.willingfish.sock5.serv.hanlder.Socks5CommandRequestHandler;
+import org.willingfish.sock5.serv.hanlder.Socks5InitialRequestHandler;
 
 
 @Slf4j
-public class Server {
+public class Server implements IServer, ApplicationContextAware {
     @Setter
     Integer port;
+    @Setter
+    CipherToPlainDecoder cipherToPlainDecoder;
+    @Setter
+    PlainToCipherEncoder plainToCipherEncoder;
 
     public void start() {
 
@@ -36,13 +46,14 @@ public class Server {
                         ch.pipeline()
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
+                                .addLast(cipherToPlainDecoder)
+                                .addLast(plainToCipherEncoder)
                                 .addLast(new LoggingHandler())
                                 .addLast(Socks5ServerEncoder.DEFAULT)
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())
                                 .addLast(new Socks5CommandRequestDecoder())
-                                .addLast(new Socks5CommandRequestHandler(group))
-                                ;
+                                .addLast(new Socks5CommandRequestHandler(group));
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
@@ -58,5 +69,11 @@ public class Server {
             group.shutdownGracefully();
         }
 
+    }
+
+    ApplicationContext applicationContext;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

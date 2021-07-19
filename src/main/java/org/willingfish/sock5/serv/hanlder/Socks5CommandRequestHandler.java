@@ -1,4 +1,4 @@
-package org.willingfish.sock5.hanlder;
+package org.willingfish.sock5.serv.hanlder;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -7,8 +7,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.v5.*;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.ByteBuffer;
 
 @Slf4j
 public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5CommandRequest> {
@@ -32,25 +30,23 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //ch.pipeline().addLast(new LoggingHandler());//in out
                             //将目标服务器信息转发给客户端
-                            ch.pipeline().addLast(new Dest2ClientHandler(clientChannelContext));
+                            ch.pipeline().addLast(new Dest2LocalHandler(clientChannelContext));
                         }
                     });
             log.trace("连接目标服务器");
-            ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
-            future.addListener(new ChannelFutureListener() {
-
-                public void operationComplete(final ChannelFuture future) throws Exception {
-                    if(future.isSuccess()) {
-                        log.trace("成功连接目标服务器");
-                        clientChannelContext.pipeline().addLast(new Client2DestHandler(future));
-                        Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
-                        clientChannelContext.writeAndFlush(commandResponse);
-                    } else {
-                        Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
-                        clientChannelContext.writeAndFlush(commandResponse);
-                    }
+            bootstrap.connect(msg.dstAddr(), msg.dstPort())
+                    .addListener((ChannelFutureListener) future -> {
+                if(future.isSuccess()) {
+                    log.trace("成功连接目标服务器");
+                    clientChannelContext.pipeline().addLast(new Local2DestHandler(future));
+                    Socks5CommandResponse commandResponse =
+                            new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
+                    clientChannelContext.writeAndFlush(commandResponse);
+                } else {
+                    Socks5CommandResponse commandResponse =
+                            new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
+                    clientChannelContext.writeAndFlush(commandResponse);
                 }
-
             });
         } else {
             clientChannelContext.fireChannelRead(msg);
@@ -64,11 +60,11 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
      * @author huchengyi
      *
      */
-    private static class Dest2ClientHandler extends ChannelInboundHandlerAdapter {
+    private static class Dest2LocalHandler extends ChannelInboundHandlerAdapter {
 
         private ChannelHandlerContext clientChannelContext;
 
-        public Dest2ClientHandler(ChannelHandlerContext clientChannelContext) {
+        public Dest2LocalHandler(ChannelHandlerContext clientChannelContext) {
             this.clientChannelContext = clientChannelContext;
         }
 
@@ -95,7 +91,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            log.error("dest to client channel meet exception",cause);
+            log.error("dest to local channel meet exception",cause);
             ctx.channel().close();
         }
     }
@@ -106,11 +102,11 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
      * @author huchengyi
      *
      */
-    private static class Client2DestHandler extends ChannelInboundHandlerAdapter {
+    private static class Local2DestHandler extends ChannelInboundHandlerAdapter {
 
         private ChannelFuture destChannelFuture;
 
-        public Client2DestHandler(ChannelFuture destChannelFuture) {
+        public Local2DestHandler(ChannelFuture destChannelFuture) {
             this.destChannelFuture = destChannelFuture;
         }
 
@@ -138,7 +134,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            log.error("client to dest channel failed",cause);
+            log.error("local to dest channel failed",cause);
             ctx.channel().close();
         }
     }

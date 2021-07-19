@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="classpath:application.properties" />
+    </bean>
+    <bean id="listener" class="org.willingfish.sock5.Listener">
+        <property name="server" ref="server" />
+    </bean>
+    <bean id="aesCoder" class="org.willingfish.sock5.ciper.AESCoder">
+        <property name="password" value="${pass}"/>
+    </bean>
+    <bean id="cipherToPlaintDecoder" class="org.willingfish.sock5.common.handler.CipherToPlainDecoder" >
+        <property name="aesCoder" ref="aesCoder"/>
+    </bean>
+    <bean id="plainToCipherEncoder" class="org.willingfish.sock5.common.handler.PlainToCipherEncoder" >
+        <property name="aesCoder" ref="aesCoder"/>
+        <property name="maxFrameLength" value="${maxFrameLength}"/>
+    </bean>
+</beans>
