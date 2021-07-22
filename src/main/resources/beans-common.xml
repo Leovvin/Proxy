@@ -19,6 +19,7 @@
     </bean>
     <bean id="plainToCipherEncoder" class="org.willingfish.sock5.common.handler.PlainToCipherEncoder" >
         <property name="aesCoder" ref="aesCoder"/>
-        <property name="maxFrameLength" value="${maxFrameLength}"/>
+        <property name="maxPayloadLength" value="${maxPayloadLength}"/>
+        <property name="headerLength" value="${headerLength}"/>
     </bean>
 </beans>
