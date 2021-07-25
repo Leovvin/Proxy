@@ -19,8 +19,6 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
     @Setter
     Integer port;
     @Setter
-    Integer maxFrameLength;
-    @Setter
     CipherToPlainDecoder cipherToPlainDecoder;
     @Setter
     PlainToCipherEncoder plainToCipherEncoder;
@@ -44,9 +42,8 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(maxFrameLength,0,2))
-                                .addLast(cipherToPlainDecoder)
-                                .addLast(plainToCipherEncoder)
+//                                .addLast(cipherToPlainDecoder)
+//                                .addLast(plainToCipherEncoder)
                                 .addLast(new Server2ClientHandler(ctx));
                     }
                 });

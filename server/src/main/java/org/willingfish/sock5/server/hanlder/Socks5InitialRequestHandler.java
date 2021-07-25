@@ -1,4 +1,4 @@
-package org.willingfish.sock5.serv.hanlder;
+package org.willingfish.sock5.server.hanlder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

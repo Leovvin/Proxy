@@ -5,6 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
+
     <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="classpath:application.properties" />
     </bean>
@@ -24,4 +25,10 @@
         <property name="maxPayloadLength" value="${maxPayloadLength}"/>
         <property name="headerLength" value="${headerLength}"/>
     </bean>
+    <bean id="server" class="org.willingfish.sock5.server.Server">
+        <property name="port" value="${serverPort}" />
+        <property name="cipherToPlainDecoder" ref="cipherToPlaintDecoder"/>
+        <property name="plainToCipherEncoder" ref="plainToCipherEncoder"/>
+    </bean>
+
 </beans>

@@ -6,7 +6,13 @@
 
     <groupId>org.willingfish</groupId>
     <artifactId>Proxy</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>common</module>
+        <module>server</module>
+        <module>local</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

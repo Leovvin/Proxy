@@ -1,4 +1,4 @@
-package org.willingfish.sock5.ciper;
+package org.willingfish.sock5.common.ciper;
 
 import lombok.Setter;
 

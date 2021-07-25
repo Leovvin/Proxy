@@ -1,4 +1,4 @@
-package org.willingfish.sock5.serv;
+package org.willingfish.sock5.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -8,7 +8,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,8 @@ import org.willingfish.sock5.common.IServer;
 import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
 import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
 import org.willingfish.sock5.common.handler.ProxyIdleHandler;
-import org.willingfish.sock5.serv.hanlder.Socks5CommandRequestHandler;
-import org.willingfish.sock5.serv.hanlder.Socks5InitialRequestHandler;
+import org.willingfish.sock5.server.hanlder.Socks5CommandRequestHandler;
+import org.willingfish.sock5.server.hanlder.Socks5InitialRequestHandler;
 
 
 @Slf4j
@@ -31,6 +30,7 @@ public class Server implements IServer, ApplicationContextAware {
     CipherToPlainDecoder cipherToPlainDecoder;
     @Setter
     PlainToCipherEncoder plainToCipherEncoder;
+
 
     public void start() {
 
@@ -46,9 +46,8 @@ public class Server implements IServer, ApplicationContextAware {
                         ch.pipeline()
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
-                                .addLast(cipherToPlainDecoder)
-                                .addLast(plainToCipherEncoder)
-                                .addLast(new LoggingHandler())
+//                                .addLast(cipherToPlainDecoder)
+//                                .addLast(plainToCipherEncoder)
                                 .addLast(Socks5ServerEncoder.DEFAULT)
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())

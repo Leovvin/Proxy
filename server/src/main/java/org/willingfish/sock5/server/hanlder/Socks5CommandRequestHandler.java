@@ -1,4 +1,4 @@
-package org.willingfish.sock5.serv.hanlder;
+package org.willingfish.sock5.server.hanlder;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -17,7 +17,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
     }
     @Override
     protected void channelRead0(ChannelHandlerContext clientChannelContext, DefaultSocks5CommandRequest msg) throws Exception {
-        log.debug("目标服务器  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
+        log.info("目标服务器  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
         if(msg.type().equals(Socks5CommandType.CONNECT)) {
             log.trace("准备连接目标服务器");
 

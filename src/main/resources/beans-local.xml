@@ -14,7 +14,6 @@
     <bean id="clientToServerHandler" class="org.willingfish.sock5.local.handler.ClientToServerHandler" scope="prototype">
         <property name="server" value="${server}"/>
         <property name="port" value="${serverPort}"/>
-        <property name="maxFrameLength" value="${maxFrameLength}" />
         <property name="cipherToPlainDecoder" ref="cipherToPlaintDecoder"/>
         <property name="plainToCipherEncoder" ref="plainToCipherEncoder"/>
     </bean>
