@@ -6,7 +6,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
@@ -75,7 +74,7 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
 
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
             log.error("dest to local channel meet exception",cause);
             ctx.channel().close();
         }

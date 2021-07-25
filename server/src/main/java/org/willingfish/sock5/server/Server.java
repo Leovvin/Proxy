@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.willingfish.sock5.common.IServer;
 import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
+import org.willingfish.sock5.common.handler.EchoHandler;
 import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
 import org.willingfish.sock5.common.handler.ProxyIdleHandler;
 import org.willingfish.sock5.server.hanlder.Socks5CommandRequestHandler;
@@ -44,15 +45,17 @@ public class Server implements IServer, ApplicationContextAware {
                             throws Exception {
                         System.out.println("initChannel ch:" + ch);
                         ch.pipeline()
-                                .addLast(new IdleStateHandler(3, 30, 0))
-                                .addLast(new ProxyIdleHandler())
+//                                .addLast(new IdleStateHandler(3, 30, 0))
+//                                .addLast(new ProxyIdleHandler())
+                                .addLast(new EchoHandler())
 //                                .addLast(cipherToPlainDecoder)
 //                                .addLast(plainToCipherEncoder)
-                                .addLast(Socks5ServerEncoder.DEFAULT)
-                                .addLast(new Socks5InitialRequestDecoder())
-                                .addLast(new Socks5InitialRequestHandler())
-                                .addLast(new Socks5CommandRequestDecoder())
-                                .addLast(new Socks5CommandRequestHandler(group));
+//                                .addLast(Socks5ServerEncoder.DEFAULT)
+//                                .addLast(new Socks5InitialRequestDecoder())
+//                                .addLast(new Socks5InitialRequestHandler())
+//                                .addLast(new Socks5CommandRequestDecoder())
+//                                .addLast(new Socks5CommandRequestHandler(group))
+                        ;
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128) // determining the number of connections queued
