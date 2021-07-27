@@ -12,7 +12,6 @@
         <module>common</module>
         <module>server</module>
         <module>local</module>
-        <module>mocker</module>
     </modules>
 
     <properties>

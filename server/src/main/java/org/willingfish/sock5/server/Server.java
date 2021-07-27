@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.willingfish.sock5.common.IServer;
 import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
-import org.willingfish.sock5.common.handler.EchoHandler;
 import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
 import org.willingfish.sock5.common.handler.ProxyIdleHandler;
 import org.willingfish.sock5.server.hanlder.Socks5CommandRequestHandler;
