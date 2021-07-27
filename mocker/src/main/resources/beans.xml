@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="classpath:application.properties" />
+    </bean>
+    <bean id="aesCoder" class="org.willingfish.sock5.common.ciper.AESCoder" init-method="init">
+        <property name="password" value="${pass}"/>
+    </bean>
+    <bean id="cipherToPlaintDecoder" class="org.willingfish.sock5.common.handler.CipherToPlainDecoder" >
+        <property name="aesCoder" ref="aesCoder"/>
+        <property name="maxPayloadLength" value="${maxPayloadLength}"/>
+        <property name="headerLength" value="${headerLength}"/>
+    </bean>
+    <bean id="plainToCipherEncoder" class="org.willingfish.sock5.common.handler.PlainToCipherEncoder" >
+        <property name="aesCoder" ref="aesCoder"/>
+        <property name="maxPayloadLength" value="${maxPayloadLength}"/>
+        <property name="headerLength" value="${headerLength}"/>
+    </bean>
+
+    <bean id="mocker" class="org.willingfish.sock5.mocker.Mocker" init-method="init">
+        <property name="server" value="${server}"/>
+        <property name="port" value="${serverPort}"/>
+        <property name="cipherToPlainDecoder" ref="cipherToPlaintDecoder"/>
+        <property name="plainToCipherEncoder" ref="plainToCipherEncoder"/>
+    </bean>
+
+</beans>
