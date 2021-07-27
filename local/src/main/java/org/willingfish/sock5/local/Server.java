@@ -39,7 +39,6 @@ public class Server implements IServer, ApplicationContextAware {
                     @Override
                     public void initChannel(SocketChannel ch)
                             throws Exception {
-                        System.out.println("initChannel ch:" + ch);
                         ch.pipeline()
                                 .addLast(applicationContext.getBean(ClientToServerHandler.class));
                     }

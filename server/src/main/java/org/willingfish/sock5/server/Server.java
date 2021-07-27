@@ -44,14 +44,12 @@ public class Server implements IServer, ApplicationContextAware {
                     @Override
                     public void initChannel(SocketChannel ch)
                             throws Exception {
-                        System.out.println("initChannel ch:" + ch);
                         ch.pipeline()
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
                                 .addLast(new LengthFieldBasedFrameDecoder(65536+4,0,4))
                                 .addLast(cipherToPlainDecoder)
                                 .addLast(plainToCipherEncoder)
-//                                .addLast(new EchoHandler())
                                 .addLast(Socks5ServerEncoder.DEFAULT)
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())
