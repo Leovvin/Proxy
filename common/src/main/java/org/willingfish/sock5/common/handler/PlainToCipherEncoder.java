@@ -2,6 +2,7 @@ package org.willingfish.sock5.common.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -23,7 +24,7 @@ public class PlainToCipherEncoder extends MessageToMessageEncoder<ByteBuf> {
     protected void encode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         int maxFrameLength = maxPayloadLength + headerLength;
         byte[] plain;
-        if (byteBuf.readableBytes() > maxPayloadLength) {
+        if (byteBuf.readableBytes() > maxFrameLength) {
             plain = new byte[maxFrameLength];
             byteBuf.readSlice(maxFrameLength).readBytes(plain);
         }else {
@@ -31,7 +32,7 @@ public class PlainToCipherEncoder extends MessageToMessageEncoder<ByteBuf> {
             byteBuf.readBytes(plain);
         }
         byte[] cipher = aesCoder.encrypt(plain);
-        ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer(cipher.length+headerLength);
+        ByteBuf buf = Unpooled.buffer(cipher.length+headerLength);
         buf.writeInt(cipher.length);
         buf.writeBytes(cipher);
         out.add(buf);

@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
@@ -41,8 +42,9 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-//                                .addLast(cipherToPlainDecoder)
-//                                .addLast(plainToCipherEncoder)
+                                .addLast(new LengthFieldBasedFrameDecoder(65536+4,0,4))
+                                .addLast(cipherToPlainDecoder)
+                                .addLast(plainToCipherEncoder)
                                 .addLast(new Server2ClientHandler(ctx));
                     }
                 });

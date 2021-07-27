@@ -22,6 +22,7 @@ public class Server implements IServer, ApplicationContextAware {
     Integer localPort;
 
     ApplicationContext applicationContext;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -30,8 +31,9 @@ public class Server implements IServer, ApplicationContextAware {
     public void start() {
 
         ServerBootstrap b = new ServerBootstrap();
-        NioEventLoopGroup group = new NioEventLoopGroup();
-        b.group(group)
+        NioEventLoopGroup boss = new NioEventLoopGroup(1);
+        NioEventLoopGroup worker = new NioEventLoopGroup();
+        b.group(boss, worker)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -52,7 +54,7 @@ public class Server implements IServer, ApplicationContextAware {
         } catch (InterruptedException e) {
             log.error("server meet unknown exception.", e);
         } finally {
-            group.shutdownGracefully();
+            boss.shutdownGracefully();
         }
 
     }

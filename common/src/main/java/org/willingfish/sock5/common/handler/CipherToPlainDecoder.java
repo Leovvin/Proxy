@@ -21,13 +21,8 @@ public class CipherToPlainDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        if (byteBuf.readableBytes()<headerLength){
-            return;
-        }
+        System.out.println("begin decode,readable length:"+byteBuf.readableBytes());
         int payloadLength = byteBuf.readInt();
-        if (byteBuf.readableBytes()<payloadLength){
-            return;
-        }
         ByteBuf frameBuf = byteBuf.readSlice(payloadLength);
         byte[] cipher = new byte[payloadLength];
         frameBuf.readBytes(cipher);

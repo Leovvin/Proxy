@@ -11,7 +11,7 @@
     <bean id="listener" class="org.willingfish.sock5.common.Listener">
         <property name="server" ref="server" />
     </bean>
-    <bean id="aesCoder" class="org.willingfish.sock5.common.ciper.AESCoder">
+    <bean id="aesCoder" class="org.willingfish.sock5.common.ciper.AESCoder" init-method="init">
         <property name="password" value="${pass}"/>
     </bean>
     <bean id="cipherToPlaintDecoder" class="org.willingfish.sock5.common.handler.CipherToPlainDecoder" >

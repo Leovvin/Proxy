@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
@@ -36,8 +37,9 @@ public class Server implements IServer, ApplicationContextAware {
     public void start() {
 
         ServerBootstrap b = new ServerBootstrap();
-        NioEventLoopGroup group = new NioEventLoopGroup();
-        b.group(group)
+        NioEventLoopGroup boss = new NioEventLoopGroup(1);
+        NioEventLoopGroup worker = new NioEventLoopGroup();
+        b.group(boss, worker)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -45,16 +47,17 @@ public class Server implements IServer, ApplicationContextAware {
                             throws Exception {
                         System.out.println("initChannel ch:" + ch);
                         ch.pipeline()
-//                                .addLast(new IdleStateHandler(3, 30, 0))
-//                                .addLast(new ProxyIdleHandler())
-                                .addLast(new EchoHandler())
-//                                .addLast(cipherToPlainDecoder)
-//                                .addLast(plainToCipherEncoder)
-//                                .addLast(Socks5ServerEncoder.DEFAULT)
-//                                .addLast(new Socks5InitialRequestDecoder())
-//                                .addLast(new Socks5InitialRequestHandler())
-//                                .addLast(new Socks5CommandRequestDecoder())
-//                                .addLast(new Socks5CommandRequestHandler(group))
+                                .addLast(new IdleStateHandler(3, 30, 0))
+                                .addLast(new ProxyIdleHandler())
+                                .addLast(new LengthFieldBasedFrameDecoder(65536+4,0,4))
+                                .addLast(cipherToPlainDecoder)
+                                .addLast(plainToCipherEncoder)
+//                                .addLast(new EchoHandler())
+                                .addLast(Socks5ServerEncoder.DEFAULT)
+                                .addLast(new Socks5InitialRequestDecoder())
+                                .addLast(new Socks5InitialRequestHandler())
+                                .addLast(new Socks5CommandRequestDecoder())
+                                .addLast(new Socks5CommandRequestHandler(worker))
                         ;
                     }
                 })
@@ -68,12 +71,13 @@ public class Server implements IServer, ApplicationContextAware {
         } catch (InterruptedException e) {
             log.error("server meet unknown exception.", e);
         } finally {
-            group.shutdownGracefully();
+            boss.shutdownGracefully();
         }
 
     }
 
     ApplicationContext applicationContext;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
