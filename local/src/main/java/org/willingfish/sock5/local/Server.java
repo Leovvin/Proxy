@@ -7,12 +7,14 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.willingfish.sock5.common.IServer;
+import org.willingfish.sock5.common.handler.ProxyIdleHandler;
 import org.willingfish.sock5.local.handler.ClientToServerHandler;
 
 
@@ -40,6 +42,8 @@ public class Server implements IServer, ApplicationContextAware {
                     public void initChannel(SocketChannel ch)
                             throws Exception {
                         ch.pipeline()
+                                .addLast(new IdleStateHandler(3, 30, 0))
+                                .addLast(new ProxyIdleHandler())
                                 .addLast(applicationContext.getBean(ClientToServerHandler.class));
                     }
                 })

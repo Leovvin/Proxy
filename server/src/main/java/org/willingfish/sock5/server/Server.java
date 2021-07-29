@@ -54,7 +54,7 @@ public class Server implements IServer, ApplicationContextAware {
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())
                                 .addLast(new Socks5CommandRequestDecoder())
-                                .addLast(new Socks5CommandRequestHandler(worker))
+                                .addLast(new Socks5CommandRequestHandler())
                         ;
                     }
                 })

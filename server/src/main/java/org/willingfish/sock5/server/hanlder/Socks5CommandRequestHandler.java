@@ -3,6 +3,7 @@ package org.willingfish.sock5.server.hanlder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.v5.*;
@@ -10,11 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5CommandRequest> {
-    EventLoopGroup bossGroup;
+    static EventLoopGroup group = new NioEventLoopGroup();
 
-    public Socks5CommandRequestHandler(EventLoopGroup bossGroup){
-        this.bossGroup = bossGroup;
-    }
     @Override
     protected void channelRead0(ChannelHandlerContext clientChannelContext, DefaultSocks5CommandRequest msg) throws Exception {
         log.info("目标服务器  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
@@ -22,7 +20,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
             log.trace("准备连接目标服务器");
 
             Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(bossGroup)
+            bootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {

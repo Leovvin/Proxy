@@ -23,6 +23,8 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
     @Setter
     PlainToCipherEncoder plainToCipherEncoder;
 
+    static NioEventLoopGroup group = new NioEventLoopGroup();
+
     Channel clientChannel;
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -34,7 +36,6 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
 
     Channel createClientChannel(ChannelHandlerContext ctx) throws InterruptedException {
         Bootstrap bootstrap = new Bootstrap();
-        NioEventLoopGroup group = new NioEventLoopGroup();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -49,6 +50,11 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
                     }
                 });
         return bootstrap.connect(server,port).sync().channel();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        clientChannel.close();
     }
 
     private class Server2ClientHandler extends ChannelInboundHandlerAdapter {

@@ -2,6 +2,7 @@ package org.willingfish.sock5.common.ciper;
 
 import io.netty.util.internal.StringUtil;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -12,17 +13,19 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+@Slf4j
 public class AESCoder {
     @Setter
     String password;
     SecretKeySpec skeySpec;
 
-    void init(){
-        if (StringUtil.isNullOrEmpty(password)){
+    void init() {
+        if (StringUtil.isNullOrEmpty(password)) {
             password = "1234567890123456";
-        }else if (password.getBytes(StandardCharsets.UTF_8).length!=16){
+        } else if (password.getBytes(StandardCharsets.UTF_8).length != 16) {
             password = "1234567890123456";
         }
+        log.info("pass:{}", password);
         byte[] raw = password.getBytes(StandardCharsets.UTF_8);
         skeySpec = new SecretKeySpec(raw, "AES");
     }
