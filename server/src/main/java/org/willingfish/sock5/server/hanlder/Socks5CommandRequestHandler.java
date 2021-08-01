@@ -68,7 +68,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelRead(ChannelHandlerContext ctx2, Object destMsg) throws Exception {
-            log.info("send data from target server to client");
+            log.debug("send data from target server to client");
             if (destMsg==null){
                 return;
             }
@@ -83,7 +83,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx2) throws Exception {
-            log.info("break target server connect");
+            log.debug("break target server connect");
             clientChannelContext.channel().close();
         }
 
@@ -110,7 +110,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            log.info("send data from client to target server");
+            log.debug("send data from client to target server");
             if (msg==null){
                 return;
             }
@@ -125,7 +125,7 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-            log.info("break client connect");
+            log.debug("break client connect");
             destChannelFuture.channel().close();
         }
 

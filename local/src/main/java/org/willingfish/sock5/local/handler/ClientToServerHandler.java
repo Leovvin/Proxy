@@ -6,11 +6,12 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.ssl.SslHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
-import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
+import org.willingfish.sock5.common.ssl.ISslEngineFactory;
+
+import javax.net.ssl.SSLEngine;
 
 @Slf4j
 public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
@@ -19,9 +20,8 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
     @Setter
     Integer port;
     @Setter
-    CipherToPlainDecoder cipherToPlainDecoder;
-    @Setter
-    PlainToCipherEncoder plainToCipherEncoder;
+    ISslEngineFactory sslEngineFactory;
+
 
     static NioEventLoopGroup group = new NioEventLoopGroup();
 
@@ -42,10 +42,11 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        SSLEngine engine = sslEngineFactory.createSslEngine();
+                        engine.setUseClientMode(true);
+
                         ch.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(65536+4,0,4))
-                                .addLast(cipherToPlainDecoder)
-                                .addLast(plainToCipherEncoder)
+                                .addLast(new SslHandler(engine))
                                 .addLast(new Server2ClientHandler(ctx));
                     }
                 });
@@ -54,7 +55,13 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("channel inactive, break connect");
         clientChannel.close();
+    }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
+        log.error("dest to local channel meet exception",cause);
+        ctx.channel().close();
     }
 
     private class Server2ClientHandler extends ChannelInboundHandlerAdapter {
@@ -67,7 +74,7 @@ public class ClientToServerHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx2, Object destMsg) throws Exception {
-            log.info("send data from target server to client");
+            log.debug("send data from target server to client");
             if (destMsg==null){
                 return;
             }

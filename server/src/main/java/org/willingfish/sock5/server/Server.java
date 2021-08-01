@@ -5,10 +5,10 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +16,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.willingfish.sock5.common.IServer;
-import org.willingfish.sock5.common.handler.CipherToPlainDecoder;
-import org.willingfish.sock5.common.handler.PlainToCipherEncoder;
 import org.willingfish.sock5.common.handler.ProxyIdleHandler;
+import org.willingfish.sock5.common.ssl.ISslEngineFactory;
 import org.willingfish.sock5.server.hanlder.Socks5CommandRequestHandler;
 import org.willingfish.sock5.server.hanlder.Socks5InitialRequestHandler;
+
+import javax.net.ssl.SSLEngine;
 
 
 @Slf4j
@@ -28,10 +29,7 @@ public class Server implements IServer, ApplicationContextAware {
     @Setter
     Integer port;
     @Setter
-    CipherToPlainDecoder cipherToPlainDecoder;
-    @Setter
-    PlainToCipherEncoder plainToCipherEncoder;
-
+    ISslEngineFactory sslEngineFactory;
 
     public void start() {
 
@@ -44,12 +42,15 @@ public class Server implements IServer, ApplicationContextAware {
                     @Override
                     public void initChannel(SocketChannel ch)
                             throws Exception {
+//                        String sChatPath = "/Users/lianhe/PrivateProjects/Proxy/conf/sChat.jks";
+                        SSLEngine engine = sslEngineFactory.createSslEngine();
+                        engine.setUseClientMode(false);//设置服务端模式
+                        engine.setNeedClientAuth(true);//需要客户端验证
+
                         ch.pipeline()
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
-                                .addLast(new LengthFieldBasedFrameDecoder(65536+4,0,4))
-                                .addLast(cipherToPlainDecoder)
-                                .addLast(plainToCipherEncoder)
+                                .addLast(new SslHandler(engine))
                                 .addLast(Socks5ServerEncoder.DEFAULT)
                                 .addLast(new Socks5InitialRequestDecoder())
                                 .addLast(new Socks5InitialRequestHandler())

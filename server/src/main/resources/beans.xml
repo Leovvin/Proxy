@@ -7,28 +7,18 @@
 
 
     <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="location" value="classpath:application.properties" />
+        <property name="location" value="${configPath:classpath:application.properties}" />
     </bean>
     <bean id="listener" class="org.willingfish.sock5.common.Listener">
         <property name="server" ref="server" />
     </bean>
-    <bean id="aesCoder" class="org.willingfish.sock5.common.ciper.AESCoder" init-method="init">
-        <property name="password" value="${pass}"/>
-    </bean>
-    <bean id="cipherToPlaintDecoder" class="org.willingfish.sock5.common.handler.CipherToPlainDecoder" >
-        <property name="aesCoder" ref="aesCoder"/>
-        <property name="maxPayloadLength" value="${maxPayloadLength}"/>
-        <property name="headerLength" value="${headerLength}"/>
-    </bean>
-    <bean id="plainToCipherEncoder" class="org.willingfish.sock5.common.handler.PlainToCipherEncoder" >
-        <property name="aesCoder" ref="aesCoder"/>
-        <property name="maxPayloadLength" value="${maxPayloadLength}"/>
-        <property name="headerLength" value="${headerLength}"/>
+    <bean id="sslEngineFactory" class="org.willingfish.sock5.common.ssl.SslEngineFactoryImpl">
+        <constructor-arg index="0" value="${serverCaPath}" />
+        <constructor-arg index="1" value="${serverCaPass}" />
     </bean>
     <bean id="server" class="org.willingfish.sock5.server.Server">
         <property name="port" value="${serverPort}" />
-        <property name="cipherToPlainDecoder" ref="cipherToPlaintDecoder"/>
-        <property name="plainToCipherEncoder" ref="plainToCipherEncoder"/>
+        <property name="sslEngineFactory" ref="sslEngineFactory" />
     </bean>
 
 </beans>
