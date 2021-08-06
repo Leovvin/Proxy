@@ -9,14 +9,14 @@
     <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="${configPath:classpath:application.properties}" />
     </bean>
-    <bean id="listener" class="org.willingfish.sock5.common.Listener">
+    <bean id="listener" class="org.willingfish.socks.common.Listener">
         <property name="server" ref="server" />
     </bean>
-    <bean id="sslEngineFactory" class="org.willingfish.sock5.common.ssl.SslEngineFactoryImpl">
+    <bean id="sslEngineFactory" class="org.willingfish.socks.common.ssl.SslEngineFactoryImpl">
         <constructor-arg index="0" value="${serverCaPath}" />
         <constructor-arg index="1" value="${serverCaPass}" />
     </bean>
-    <bean id="server" class="org.willingfish.sock5.server.Server">
+    <bean id="server" class="org.willingfish.socks.server.Server">
         <property name="port" value="${serverPort}" />
         <property name="sslEngineFactory" ref="sslEngineFactory" />
     </bean>

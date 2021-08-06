@@ -8,18 +8,18 @@
     <bean id="propertyConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="${configPath:classpath:application.properties}" />
     </bean>
-    <bean id="listener" class="org.willingfish.sock5.common.Listener">
+    <bean id="listener" class="org.willingfish.socks.common.Listener">
         <property name="server" ref="server" />
     </bean>
-    <bean id="server" class="org.willingfish.sock5.local.Server">
+    <bean id="server" class="org.willingfish.socks.local.Server">
         <property name="localPort" value="${localPort}" />
     </bean>
-    <bean id="sslEngineFactory" class="org.willingfish.sock5.common.ssl.SslEngineFactoryImpl">
+    <bean id="sslEngineFactory" class="org.willingfish.socks.common.ssl.SslEngineFactoryImpl">
         <constructor-arg index="0" value="${localCaPath}" />
         <constructor-arg index="1" value="${localCaPass}" />
     </bean>
 
-    <bean id="clientToServerHandler" class="org.willingfish.sock5.local.handler.ClientToServerHandler" scope="prototype">
+    <bean id="clientToServerHandler" class="org.willingfish.socks.local.handler.ClientToServerHandler" scope="prototype">
         <property name="server" value="${server}"/>
         <property name="port" value="${serverPort}"/>
         <property name="sslEngineFactory" ref="sslEngineFactory" />

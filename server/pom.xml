@@ -34,7 +34,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.willingfish.sock5.server.Main</mainClass>
+                            <mainClass>org.willingfish.socks.server.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
