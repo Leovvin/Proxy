@@ -1,5 +1,6 @@
 package org.willingfish.socks.common.ssl;
 
+import io.netty.handler.ssl.OpenSslX509KeyManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -19,14 +20,14 @@ public class SslEngineFactoryImpl implements ISslEngineFactory {
     public SslEngineFactoryImpl(String caPath, String pass) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
         KeyManagerFactory kmf = null;
         try(InputStream in= new FileInputStream(caPath)) {
-            KeyStore ks = KeyStore.getInstance("JKS");
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
             ks.load(in, pass.toCharArray());
             kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, pass.toCharArray());
         }
         TrustManagerFactory tf = null;
         try(InputStream in= new FileInputStream(caPath)) {
-            KeyStore tks = KeyStore.getInstance("JKS");
+            KeyStore tks = KeyStore.getInstance(KeyStore.getDefaultType());
             tks.load(in, pass.toCharArray());
             tf = TrustManagerFactory.getInstance("SunX509");
             tf.init(tks);
