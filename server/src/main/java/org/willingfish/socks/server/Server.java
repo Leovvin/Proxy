@@ -7,6 +7,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
 import io.netty.handler.codec.socksx.v4.Socks4ServerEncoder;
+import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
+import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
+import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
@@ -18,6 +21,8 @@ import org.willingfish.socks.common.IServer;
 import org.willingfish.socks.common.handler.ProxyIdleHandler;
 import org.willingfish.socks.common.ssl.ISslEngineFactory;
 import org.willingfish.socks.server.hanlder.Socks4CommandRequestHandler;
+import org.willingfish.socks.server.hanlder.Socks5CommandRequestHandler;
+import org.willingfish.socks.server.hanlder.Socks5InitialRequestHandler;
 
 import javax.net.ssl.SSLEngine;
 
@@ -48,10 +53,11 @@ public class Server implements IServer, ApplicationContextAware {
                                 .addLast(new IdleStateHandler(3, 30, 0))
                                 .addLast(new ProxyIdleHandler())
                                 .addLast(new SslHandler(engine))
-                                .addLast(Socks4ServerEncoder.INSTANCE)
-                                .addLast(new Socks4ServerDecoder())
-                                .addLast(new Socks4CommandRequestHandler())
-
+                                .addLast(Socks5ServerEncoder.DEFAULT)
+                                .addLast(new Socks5InitialRequestDecoder())
+                                .addLast(new Socks5InitialRequestHandler())
+                                .addLast(new Socks5CommandRequestDecoder())
+                                .addLast(new Socks5CommandRequestHandler())
                         ;
                     }
                 })

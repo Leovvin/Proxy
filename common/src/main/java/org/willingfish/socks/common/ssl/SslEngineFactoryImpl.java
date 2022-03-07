@@ -1,6 +1,5 @@
 package org.willingfish.socks.common.ssl;
 
-import io.netty.handler.ssl.OpenSslX509KeyManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.KeyManagerFactory;
